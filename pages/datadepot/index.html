@@ -58,7 +58,33 @@
             border-left: 3px solid #00aeef;
         }
 
-        /* Search bar */
+        /* Sidebar children */
+        .sidebar-children {
+            display: none;
+            background: #f9f9f9;
+        }
+        .sidebar-children.open { display: block; }
+        .sidebar-children a.child {
+            padding-left: 28px;
+            font-size: 0.8rem;
+            color: #555;
+            border-left: none;
+        }
+        .sidebar-children a.child.active {
+            background: #f0f9fe;
+            color: #00aeef;
+            font-weight: 600;
+            border-left: 3px solid #00aeef;
+        }
+        .sidebar a.has-children::after {
+            content: ' ›';
+            float: right;
+            margin-right: 12px;
+            transition: transform 0.2s;
+        }
+        .sidebar a.has-children.open::after {
+            content: ' ⌄';
+        }
         .search-bar {
             display: flex;
             gap: 0;
@@ -182,47 +208,39 @@
             <nav class="sidebar">
                 <div class="sidebar-section">
                     <div class="sidebar-heading">Contents</div>
-                    <a href="#" class="active">DataDepot</a>
-                    <a href="#">DataDepot Update Schedule</a>
+                    <a href="#" data-topic="overview" class="active">DataDepot</a>
+                    <a href="#" data-topic="update-schedule">DataDepot Update Schedule</a>
                 </div>
                 <div class="sidebar-section">
                     <div class="sidebar-heading">Alerts &amp; Items</div>
-                    <a href="#">Alerts</a>
-                    <a href="#">Items</a>
-                    <a href="#">Orders</a>
-                    <a href="#">Receipts</a>
+                    <a href="#" data-topic="alerts">Alerts</a>
+                    <a href="#" data-topic="items">Items</a>
+                    <a href="#" data-topic="orders" class="has-children">Orders</a>
+                    <div class="sidebar-children" id="orders-children">
+                        <a href="#" data-topic="orders-overview" class="child active">Orders Tab Overview</a>
+                        <a href="#" data-topic="orders-by-type" class="child">Orders By Type Graph</a>
+                        <a href="#" data-topic="orders-search" class="child">Order Search Criteria</a>
+                        <a href="#" data-topic="orders-detail" class="child">Order Detail Page</a>
+                    </div>
+                    <a href="#" data-topic="receipts">Receipts</a>
                 </div>
                 <div class="sidebar-section">
                     <div class="sidebar-heading">Tools</div>
-                    <a href="#">Dashboard</a>
-                    <a href="#">Utilization</a>
-                    <a href="#">Smart Search</a>
+                    <a href="#" data-topic="dashboard">Dashboard</a>
+                    <a href="#" data-topic="utilization">Utilization</a>
+                    <a href="#" data-topic="smart-search">Smart Search</a>
                 </div>
                 <div class="sidebar-section">
                     <div class="sidebar-heading">How To</div>
-                    <a href="#">Download Chart as JPEG</a>
-                    <a href="#">Download Chart as PDF</a>
-                    <a href="#">Download Chart as PNG</a>
-                    <a href="#">Download Graph as SVG</a>
+                    <a href="#" data-topic="dl-jpeg">Download Chart as JPEG</a>
+                    <a href="#" data-topic="dl-pdf">Download Chart as PDF</a>
+                    <a href="#" data-topic="dl-png">Download Chart as PNG</a>
+                    <a href="#" data-topic="dl-svg">Download Graph as SVG</a>
                 </div>
             </nav>
 
-            <div class="content-area">
-                <h2>DataDepot Overview</h2>
-                <p>DataDepot provides the means to review the stock that SGI manages for you. The DataDepot web site provides two features to assist in finding and assessing information with:</p>
-                <ul>
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Smart Search</a></li>
-                </ul>
-                <p>The DataDepot web site provides you with access to information about:</p>
-                <ul>
-                    <li><a href="#">Alerts</a></li>
-                    <li><a href="#">Items</a></li>
-                    <li><a href="#">Orders</a></li>
-                    <li><a href="#">Receipts</a></li>
-                    <li><a href="#">Utilization</a></li>
-                </ul>
-                <p>Use DataDepot to assist you in making decisions about the inventory. DataDepot provides the information you need to reduce material and storage costs.</p>
+            <div class="content-area" id="content-area">
+                <!-- content injected by JS -->
             </div>
         </div>
     </main>
@@ -232,5 +250,154 @@
     </footer>
 
     <script src="../../src/js/main.js"></script>
+    <script>
+        const topics = {
+            'overview': {
+                title: 'DataDepot Overview',
+                body: `
+                    <p>DataDepot provides the means to review the stock that SGI manages for you. The DataDepot web site provides two features to assist in finding and assessing information with:</p>
+                    <ul><li><a href="#" data-topic="dashboard">Dashboard</a></li><li><a href="#" data-topic="smart-search">Smart Search</a></li></ul>
+                    <p>The DataDepot web site provides you with access to information about:</p>
+                    <ul>
+                        <li><a href="#" data-topic="alerts">Alerts</a></li>
+                        <li><a href="#" data-topic="items">Items</a></li>
+                        <li><a href="#" data-topic="orders-overview">Orders</a></li>
+                        <li><a href="#" data-topic="receipts">Receipts</a></li>
+                        <li><a href="#" data-topic="utilization">Utilization</a></li>
+                    </ul>
+                    <p>Use DataDepot to assist you in making decisions about the inventory. DataDepot provides the information you need to reduce material and storage costs.</p>`
+            },
+            'orders-overview': {
+                title: 'Orders Tab Overview',
+                body: `
+                    <p>The Orders tab provides visibility into all orders SGI manages on your behalf. From this tab you can search, filter, and review order activity across your inventory.</p>
+                    <p>The Orders tab contains the following sections:</p>
+                    <ul>
+                        <li><a href="#" data-topic="orders-by-type">Orders By Type Graph</a> — a visual breakdown of order types over a selected date range</li>
+                        <li><a href="#" data-topic="orders-search">Order Search Criteria</a> — filter orders by date, type, status, and item</li>
+                        <li><a href="#" data-topic="orders-detail">Order Detail Page</a> — drill into a specific order for line-level detail</li>
+                    </ul>
+                    <p>Use the Orders tab to monitor open orders, review historical order activity, and identify fulfillment trends.</p>`
+            },
+            'orders-by-type': {
+                title: 'Orders By Type Graph',
+                body: `
+                    <p>The Orders By Type graph displays a visual summary of orders grouped by order type for a selected date range.</p>
+                    <p>Use this graph to quickly identify which order types are most active and spot trends in fulfillment activity. The graph updates based on the search criteria you apply in the Orders tab.</p>
+                    <p>You can export the graph using the How To guides:</p>
+                    <ul>
+                        <li><a href="#" data-topic="dl-jpeg">Download Chart as JPEG</a></li>
+                        <li><a href="#" data-topic="dl-pdf">Download Chart as PDF</a></li>
+                        <li><a href="#" data-topic="dl-png">Download Chart as PNG</a></li>
+                        <li><a href="#" data-topic="dl-svg">Download Graph as SVG</a></li>
+                    </ul>`
+            },
+            'orders-search': {
+                title: 'Order Search Criteria',
+                body: `
+                    <p>The Order Search Criteria section allows you to filter the orders displayed in the Orders tab. You can filter by:</p>
+                    <ul>
+                        <li>Date range</li>
+                        <li>Order type</li>
+                        <li>Order status</li>
+                        <li>Item number</li>
+                    </ul>
+                    <p>After setting your criteria, click <strong>Search</strong> to refresh the results. You can also download the results to Excel or search within the results table.</p>`
+            },
+            'orders-detail': {
+                title: 'Order Detail Page',
+                body: `
+                    <p>The Order Detail page provides line-level information for a specific order. To access it, click any order number in the Orders search results.</p>
+                    <p>The detail page includes:</p>
+                    <ul>
+                        <li>Order header information (type, status, dates)</li>
+                        <li>Line items with quantities and statuses</li>
+                        <li>Shipment and receipt details where applicable</li>
+                    </ul>`
+            },
+            'update-schedule': {
+                title: 'DataDepot Update Schedule',
+                body: `<p>DataDepot data is refreshed on a scheduled basis. Contact your SGI representative for the specific update frequency configured for your account.</p>`
+            },
+            'alerts': {
+                title: 'Alerts',
+                body: `<p>The Alerts section surfaces inventory conditions that may require your attention, such as low stock levels or items approaching expiration.</p>`
+            },
+            'items': {
+                title: 'Items',
+                body: `<p>The Items tab provides a full view of the inventory SGI manages for you, including on-hand quantities, item details, and historical activity.</p>`
+            },
+            'receipts': {
+                title: 'Receipts',
+                body: `<p>The Receipts tab shows inbound inventory activity — items received into SGI-managed stock on your behalf.</p>`
+            },
+            'dashboard': {
+                title: 'Dashboard',
+                body: `<p>The Dashboard provides a high-level summary of your inventory health, including key metrics and charts for quick assessment.</p>`
+            },
+            'utilization': {
+                title: 'Utilization',
+                body: `<p>The Utilization section shows how your allocated storage and inventory capacity is being used over time.</p>`
+            },
+            'smart-search': {
+                title: 'Smart Search',
+                body: `<p>Smart Search allows you to search across all DataDepot data — orders, items, receipts, and alerts — from a single search bar.</p>`
+            },
+            'dl-jpeg': { title: 'Download Chart as JPEG', body: `<p>To download a chart as a JPEG: hover over the chart, click the download icon in the top-right corner, and select <strong>Download JPEG</strong>.</p>` },
+            'dl-pdf':  { title: 'Download Chart as PDF',  body: `<p>To download a chart as a PDF: hover over the chart, click the download icon in the top-right corner, and select <strong>Download PDF</strong>.</p>` },
+            'dl-png':  { title: 'Download Chart as PNG',  body: `<p>To download a chart as a PNG: hover over the chart, click the download icon in the top-right corner, and select <strong>Download PNG</strong>.</p>` },
+            'dl-svg':  { title: 'Download Graph as SVG',  body: `<p>To download a graph as an SVG: hover over the graph, click the download icon in the top-right corner, and select <strong>Download SVG</strong>.</p>` },
+        };
+
+        const ordersChildren = ['orders-overview','orders-by-type','orders-search','orders-detail'];
+
+        function loadTopic(key) {
+            const topic = topics[key];
+            if (!topic) return;
+
+            const area = document.getElementById('content-area');
+            area.innerHTML = `<h2>${topic.title}</h2>${topic.body}`;
+
+            // Re-bind inline links
+            area.querySelectorAll('a[data-topic]').forEach(a => {
+                a.addEventListener('click', e => { e.preventDefault(); loadTopic(a.dataset.topic); });
+            });
+
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+            const match = document.querySelector(`.sidebar a[data-topic="${key}"]`);
+            if (match) match.classList.add('active');
+
+            // Toggle orders children open if relevant
+            const childrenEl = document.getElementById('orders-children');
+            const ordersBtn = document.querySelector('.sidebar a[data-topic="orders"]');
+            if (ordersChildren.includes(key)) {
+                childrenEl.classList.add('open');
+                ordersBtn.classList.add('open');
+            }
+        }
+
+        // Bind all sidebar links
+        document.querySelectorAll('.sidebar a[data-topic]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const key = a.dataset.topic;
+                if (key === 'orders') {
+                    // Toggle children
+                    const childrenEl = document.getElementById('orders-children');
+                    childrenEl.classList.toggle('open');
+                    a.classList.toggle('open');
+                } else {
+                    loadTopic(key);
+                }
+            });
+        });
+
+        // Load default
+        loadTopic('overview');
+        document.getElementById('orders-children').classList.add('open');
+        document.querySelector('.sidebar a[data-topic="orders"]').classList.add('open');
+    </script>
+
 </body>
 </html>
