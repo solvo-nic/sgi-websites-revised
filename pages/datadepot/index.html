@@ -237,8 +237,25 @@
         .no-results p { font-size: 13px; }
         .no-results .suggestion { font-size: 11px; margin-top: 8px; color: #aaa; }
 
-        /* highlight in topic content */
-        #topic-content mark {
+        /* ── TOPIC FOOTER ── */
+        .topic-footer {
+            border-top: 1px solid #000;
+            margin-top: 40px;
+            padding-top: 10px;
+            font-size: 8pt;
+            font-family: Arial;
+            color: #333;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .topic-footer-links { flex: 1; line-height: 1.8; }
+        .topic-footer-links a { color: #0093d0; text-decoration: none; }
+        .topic-footer-links a:hover { text-decoration: underline; }
+        .topic-footer-divider { font-weight: bold; margin: 0 6px; color: #333; }
+        .topic-footer-logo { flex-shrink: 0; padding-top: 10px; }
+        .topic-footer-logo img { height: 36px; display: block; }
             background: #fff3b0; color: #333; padding: 0 1px; border-radius: 2px;
         }
     </style>
@@ -646,11 +663,24 @@ function loadTopic(id) {
     document.getElementById('search-field').value = '';
   }
 
-  // breadcrumb + content
-  const bc = t.breadcrumb.length
+  // breadcrumb + content + footer
+  const footer = `<div class="topic-footer">
+    <div class="topic-footer-links">
+      &copy; ${new Date().getFullYear()} SGI &mdash; Intelligent Fulfillment
+      <span class="topic-footer-divider">|</span>
+      <a href="http://www.mysgi.com/privacy.htm" target="_blank">Privacy Policy</a>
+      <span class="topic-footer-divider">|</span>
+      <a href="mailto:info@mysgi.com">info@mysgi.com</a>
+      <span class="topic-footer-divider">|</span>
+      <a href="mailto:documentation@mysgi.com">documentation@mysgi.com</a>
+    </div>
+    <div class="topic-footer-logo">
+      <img src="../../src/images/sgi_logo.svg" alt="SGI — Intelligent Fulfillment">
+    </div>
+  </div>`;  const bc = t.breadcrumb.length
     ? '<div class="breadcrumb">' + t.breadcrumb.map(b => `<a href="#">${b}</a>`).join('<span>›</span>') + (t.breadcrumb.length ? '<span>›</span>' : '') + t.title + '</div>'
     : '';
-  document.getElementById('topic-content').innerHTML = bc + t.body;
+  document.getElementById('topic-content').innerHTML = bc + t.body + footer;
 
   // update nav counter
   const idx = topicOrder.indexOf(id);
