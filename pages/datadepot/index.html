@@ -638,6 +638,14 @@ function loadTopic(id) {
   if (!t) return;
   currentTopic = id;
 
+  // clear search panel if open
+  const panel = document.getElementById('search-results-panel');
+  if (panel && panel.classList.contains('visible')) {
+    panel.classList.remove('visible');
+    document.getElementById('topic-content').style.display = '';
+    document.getElementById('search-field').value = '';
+  }
+
   // breadcrumb + content
   const bc = t.breadcrumb.length
     ? '<div class="breadcrumb">' + t.breadcrumb.map(b => `<a href="#">${b}</a>`).join('<span>›</span>') + (t.breadcrumb.length ? '<span>›</span>' : '') + t.title + '</div>'
@@ -808,7 +816,6 @@ function doSearch() {
 }
 
 function openSearchResult(id, query) {
-  clearSearch();
   loadTopic(id);
   // highlight terms in loaded content after render
   setTimeout(() => highlightInContent(query), 50);
@@ -848,19 +855,6 @@ function clearSearch() {
 }
 
 document.getElementById('search-field').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-
-// clear search when navigating via TOC
-const _origLoadTopic = loadTopic;
-function loadTopic(id) {
-  // hide search panel if visible
-  const panel = document.getElementById('search-results-panel');
-  if (panel && panel.classList.contains('visible')) {
-    panel.classList.remove('visible');
-    document.getElementById('topic-content').style.display = '';
-    document.getElementById('search-field').value = '';
-  }
-  _origLoadTopic(id);
-}
 // ── INIT ─────────────────────────────────────────────────────────────────────
 buildTree(tocData, document.getElementById('toc-tree'));
 buildIndex();
