@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataDepot 4 — SGI Nexus</title>
+    <link rel="stylesheet" href="../../src/css/theme.css">
+    <style>
+        .depot-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-top: 4px solid #00aeef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .sidebar-section:last-child { border-bottom: none; }
+
+        .sidebar-heading {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #00aeef;
+            padding: 10px 16px 4px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 7px 16px;
+            font-size: 0.84rem;
+            color: #333333;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .sidebar a:hover {
+            background: #f5f5f5;
+            color: #00aeef;
+        }
+
+        .sidebar a.active {
+            background: #f0f9fe;
+            color: #00aeef;
+            font-weight: 600;
+            border-left: 3px solid #00aeef;
+        }
+
+        /* Search bar */
+        .search-bar {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            max-width: 360px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: 2px solid #111111;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            padding: 9px 14px;
+            font-size: 0.88rem;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-bar input:focus { border-color: #00aeef; }
+
+        .search-bar button {
+            background: #00aeef;
+            color: #ffffff;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: background 0.2s;
+        }
+
+        .search-bar button:hover { background: #0099d4; }
+
+        /* Content area */
+        .content-area {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-top: 4px solid #00aeef;
+            border-radius: 4px;
+            padding: 36px 40px;
+        }
+
+        .content-area h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 20px;
+        }
+
+        .content-area p {
+            font-size: 0.92rem;
+            color: #444444;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .content-area ul {
+            list-style: none;
+            margin: 8px 0 20px 0;
+            padding: 0;
+        }
+
+        .content-area ul li {
+            padding: 4px 0;
+        }
+
+        .content-area ul li::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: #00aeef;
+            border-radius: 1px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .content-area ul li a {
+            color: #00aeef;
+            text-decoration: none;
+            font-size: 0.92rem;
+            transition: opacity 0.2s;
+        }
+
+        .content-area ul li a:hover { opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img class="logo" src="../../src/images/sgi_logo.svg" alt="SGI — Intelligent Fulfillment" />
+        <div class="header-right">
+            <a class="back-link" href="../../index.html">← Back to Portal</a>
+            <span class="tagline">DataDepot 4</span>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1><span>Data</span>Depot 4</h1>
+        <div class="accent-bar"></div>
+        <p>Inventory visibility, reporting, and analytics for SGI-managed stock.</p>
+    </div>
+
+    <main>
+        <div class="section-label">Documentation</div>
+        <div class="section-title">DATA<strong>DEPOT HELP</strong></div>
+        <div class="divider">
+            <div class="divider-square"></div>
+            <div class="divider-line"></div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Search documentation..." />
+            <button type="button">Search</button>
+        </div>
+
+        <div class="depot-layout">
+            <nav class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-heading">Contents</div>
+                    <a href="#" class="active">DataDepot</a>
+                    <a href="#">DataDepot Update Schedule</a>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-heading">Alerts &amp; Items</div>
+                    <a href="#">Alerts</a>
+                    <a href="#">Items</a>
+                    <a href="#">Orders</a>
+                    <a href="#">Receipts</a>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-heading">Tools</div>
+                    <a href="#">Dashboard</a>
+                    <a href="#">Utilization</a>
+                    <a href="#">Smart Search</a>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-heading">How To</div>
+                    <a href="#">Download Chart as JPEG</a>
+                    <a href="#">Download Chart as PDF</a>
+                    <a href="#">Download Chart as PNG</a>
+                    <a href="#">Download Graph as SVG</a>
+                </div>
+            </nav>
+
+            <div class="content-area">
+                <h2>DataDepot Overview</h2>
+                <p>DataDepot provides the means to review the stock that SGI manages for you. The DataDepot web site provides two features to assist in finding and assessing information with:</p>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Smart Search</a></li>
+                </ul>
+                <p>The DataDepot web site provides you with access to information about:</p>
+                <ul>
+                    <li><a href="#">Alerts</a></li>
+                    <li><a href="#">Items</a></li>
+                    <li><a href="#">Orders</a></li>
+                    <li><a href="#">Receipts</a></li>
+                    <li><a href="#">Utilization</a></li>
+                </ul>
+                <p>Use DataDepot to assist you in making decisions about the inventory. DataDepot provides the information you need to reduce material and storage costs.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 <span>SGI</span> — Intelligent Fulfillment &nbsp;|&nbsp; internal.mysgi.com
+    </footer>
+
+    <script src="../../src/js/main.js"></script>
+</body>
+</html>
