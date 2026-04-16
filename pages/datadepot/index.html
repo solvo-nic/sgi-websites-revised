@@ -3,401 +3,680 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DataDepot 4 — SGI Nexus</title>
-    <link rel="stylesheet" href="../../src/css/theme.css">
+    <title>Data Depot v4 Help</title>
     <style>
-        .depot-layout {
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 24px;
-            align-items: start;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body { height: 100%; overflow: hidden; font-family: Arial, Helvetica, sans-serif; font-size: 12px; background: #fff; }
+
+        /* ── HEADER ── */
+        #header {
+            position: fixed; top: 0; left: 0; right: 0; height: 85px; z-index: 100;
+            background: linear-gradient(to bottom, #ffffff 0%, #dfeef8 100%);
+            border-bottom: 1px solid #a5d2ed;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        }
+        #header .logo {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+        }
+        #header .logo img { height: 52px; }
+        #header .logo-text { font-size: 22px; font-weight: bold; color: #0093d0; letter-spacing: -0.5px; }
+        #header .logo-text span { color: #333; }
+
+        /* search bar */
+        .search-bar {
+            display: flex; align-items: center; border: 2px solid #f15922;
+            border-radius: 20px; overflow: hidden; background: #fff; height: 32px;
+        }
+        .search-bar input {
+            border: none; outline: none; padding: 0 14px; font-size: 12px;
+            font-family: Arial; width: 220px; background: transparent;
+        }
+        .search-bar button {
+            background: #f15922; border: none; color: #fff; padding: 0 14px;
+            height: 100%; cursor: pointer; font-size: 12px; font-family: Arial;
+            white-space: nowrap;
+        }
+        .search-bar button:hover { background: #d44e1a; }
+
+        /* ── BODY LAYOUT ── */
+        #body {
+            position: fixed; top: 85px; left: 0; right: 0; bottom: 0;
+            display: flex;
         }
 
-        /* Sidebar */
-        .sidebar {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-top: 4px solid #00aeef;
-            border-radius: 4px;
+        /* ── NAVIGATION SIDEBAR ── */
+        #navigation {
+            width: 300px; min-width: 300px; height: 100%;
+            border-right: 1px solid #c8dce8;
+            display: flex; flex-direction: column; background: #fff;
             overflow: hidden;
         }
 
-        .sidebar-section {
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
+        /* tabs */
+        .tabs-nav {
+            display: flex; list-style: none; border-bottom: 1px solid #c8dce8;
+            background: #eef6fb;
         }
-        .sidebar-section:last-child { border-bottom: none; }
+        .tabs-nav li {
+            flex: 1; text-align: center; cursor: pointer;
+            padding: 10px 4px 8px;
+            font-size: 11px; color: #555;
+            border-right: 1px solid #c8dce8;
+            user-select: none;
+        }
+        .tabs-nav li:last-child { border-right: none; }
+        .tabs-nav li.active {
+            background: #fff; color: #0093d0; font-weight: bold;
+            border-bottom: 2px solid #fff; margin-bottom: -1px;
+        }
+        .tabs-nav li:hover:not(.active) { background: #dfeef8; }
 
-        .sidebar-heading {
-            font-size: 0.68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: #00aeef;
-            padding: 10px 16px 4px;
-        }
+        /* tab panels */
+        .tabs-panels { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .tab-panel { display: none; flex: 1; overflow-y: auto; padding: 8px 0; }
+        .tab-panel.active { display: block; }
 
-        .sidebar a {
-            display: block;
-            padding: 7px 16px;
-            font-size: 0.84rem;
-            color: #333333;
-            text-decoration: none;
-            transition: background 0.15s, color 0.15s;
+        /* index search */
+        .tab-search {
+            width: calc(100% - 16px); margin: 8px; padding: 5px 8px;
+            border: 1px solid #c8dce8; border-radius: 3px; font-size: 11px;
+            font-family: Arial; outline: none;
         }
+        .tab-search:focus { border-color: #0093d0; }
 
-        .sidebar a:hover {
-            background: #f5f5f5;
-            color: #00aeef;
-        }
+        /* TOC tree */
+        .tree { list-style: none; padding: 0; margin: 0; }
+        .tree .tree { padding-left: 16px; }
 
-        .sidebar a.active {
-            background: #f0f9fe;
-            color: #00aeef;
-            font-weight: 600;
-            border-left: 3px solid #00aeef;
+        .tree-node > div {
+            display: flex; align-items: center; padding: 4px 8px 4px 6px;
+            cursor: pointer; user-select: none; gap: 4px;
         }
+        .tree-node > div:hover { background: #dfeef8; }
+        .tree-node.selected > div { background: #c5e3f5; color: #0093d0; font-weight: bold; }
 
-        /* Sidebar children */
-        .sidebar-children {
-            display: none;
-            background: #f9f9f9;
+        .tree-toggle {
+            width: 14px; height: 14px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; color: #666;
         }
-        .sidebar-children.open { display: block; }
-        .sidebar-children a.child {
-            padding-left: 28px;
-            font-size: 0.8rem;
-            color: #555;
-            border-left: none;
-        }
-        .sidebar-children a.child.active {
-            background: #f0f9fe;
-            color: #00aeef;
-            font-weight: 600;
-            border-left: 3px solid #00aeef;
-        }
-        .sidebar a.has-children::after {
-            content: ' ›';
-            float: right;
-            margin-right: 12px;
-            transition: transform 0.2s;
-        }
-        .sidebar a.has-children.open::after {
-            content: ' ⌄';
-        }
-        .search-bar {
-            display: flex;
-            gap: 0;
-            margin-bottom: 24px;
-            max-width: 360px;
-        }
+        .tree-toggle.spacer { visibility: hidden; }
 
-        .search-bar input {
-            flex: 1;
-            border: 2px solid #111111;
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            padding: 9px 14px;
-            font-size: 0.88rem;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            outline: none;
-            transition: border-color 0.2s;
+        .tree-icon {
+            width: 16px; height: 16px; flex-shrink: 0;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
+        .icon-book       { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='1' width='10' height='13' rx='1' fill='%230093d0' opacity='.3'/%3E%3Crect x='3' y='2' width='8' height='11' rx='1' fill='%230093d0' opacity='.6'/%3E%3Cline x1='5' y1='5' x2='9' y2='5' stroke='%23fff' stroke-width='1'/%3E%3Cline x1='5' y1='7' x2='9' y2='7' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E"); }
+        .icon-topic      { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='1' width='10' height='13' rx='1' fill='%23aaa'/%3E%3Cline x1='4' y1='5' x2='10' y2='5' stroke='%23fff' stroke-width='1'/%3E%3Cline x1='4' y1='7' x2='10' y2='7' stroke='%23fff' stroke-width='1'/%3E%3Cline x1='4' y1='9' x2='8' y2='9' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E"); }
+
+        .tree-label { font-size: 12px; color: #333; flex: 1; }
+        .tree-label a { color: inherit; text-decoration: none; }
+        .tree-node.selected .tree-label { color: #0093d0; }
+
+        .tree-children { display: none; }
+        .tree-node.expanded > .tree-children { display: block; }
+
+        /* ── CONTENT AREA ── */
+        #contentBody {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        .search-bar input:focus { border-color: #00aeef; }
-
-        .search-bar button {
-            background: #00aeef;
-            color: #ffffff;
-            border: none;
-            padding: 9px 18px;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            font-size: 0.88rem;
-            font-weight: 700;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            transition: background 0.2s;
+        /* toolbar */
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 12px; border-bottom: 1px solid #c8dce8;
+            background: #f5f9fc; flex-shrink: 0;
         }
+        .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 6px; }
 
-        .search-bar button:hover { background: #0099d4; }
-
-        /* Content area */
-        .content-area {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-top: 4px solid #00aeef;
-            border-radius: 4px;
-            padding: 36px 40px;
+        .btn-tool {
+            background: none; border: 1px solid transparent; border-radius: 3px;
+            padding: 3px 8px; font-size: 11px; font-family: Arial; cursor: pointer;
+            color: #555; display: flex; align-items: center; gap: 4px;
         }
+        .btn-tool:hover { background: #dfeef8; border-color: #a5d2ed; color: #0093d0; }
+        .btn-tool:disabled { opacity: 0.4; cursor: default; }
+        .btn-tool svg { width: 14px; height: 14px; }
 
-        .content-area h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #111111;
-            margin-bottom: 20px;
+        .nav-counter { font-size: 11px; color: #888; padding: 0 4px; }
+
+        /* stars */
+        .stars { display: flex; gap: 2px; }
+        .star { font-size: 14px; color: #ccc; cursor: pointer; }
+        .star:hover, .star.filled { color: #f5a623; }
+
+        /* content iframe area */
+        #contentBodyInner {
+            flex: 1; overflow: hidden; position: relative;
         }
-
-        .content-area p {
-            font-size: 0.92rem;
-            color: #444444;
-            line-height: 1.7;
-            margin-bottom: 16px;
+        #topic-content {
+            width: 100%; height: 100%; border: none; overflow-y: auto;
+            padding: 28px 36px; font-family: Arial; font-size: 12pt; color: #333;
+            line-height: 1.6;
         }
-
-        .content-area ul {
-            list-style: none;
-            margin: 8px 0 20px 0;
-            padding: 0;
+        #topic-content h1 { font-size: 18pt; color: #0093d0; margin-bottom: 16px; border-bottom: 1px solid #a5d2ed; padding-bottom: 8px; }
+        #topic-content h2 { font-size: 14pt; color: #333; margin: 20px 0 10px; }
+        #topic-content h3 { font-size: 12pt; color: #333; margin: 16px 0 8px; }
+        #topic-content p { margin-bottom: 12px; }
+        #topic-content ul, #topic-content ol { margin: 8px 0 12px 24px; }
+        #topic-content li { margin-bottom: 4px; }
+        #topic-content a { color: #0093d0; text-decoration: none; }
+        #topic-content a:hover { text-decoration: underline; }
+        #topic-content .note {
+            background: #eef6fb; border-left: 4px solid #0093d0;
+            padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0;
         }
+        #topic-content table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+        #topic-content th { background: #0093d0; color: #fff; padding: 6px 10px; text-align: left; font-size: 11pt; }
+        #topic-content td { padding: 6px 10px; border-bottom: 1px solid #e0e0e0; }
+        #topic-content tr:nth-child(even) td { background: #f5f9fc; }
 
-        .content-area ul li {
-            padding: 4px 0;
-        }
+        /* breadcrumb */
+        .breadcrumb { font-size: 11px; color: #888; margin-bottom: 16px; }
+        .breadcrumb a { color: #0093d0; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb span { margin: 0 4px; }
 
-        .content-area ul li::before {
-            content: '';
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            background: #00aeef;
-            border-radius: 1px;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        .content-area ul li a {
-            color: #00aeef;
-            text-decoration: none;
-            font-size: 0.92rem;
-            transition: opacity 0.2s;
-        }
-
-        .content-area ul li a:hover { opacity: 0.7; }
+        /* index list */
+        .index-list { list-style: none; padding: 0; }
+        .index-list li { padding: 4px 12px; font-size: 12px; cursor: pointer; color: #333; }
+        .index-list li:hover { background: #dfeef8; color: #0093d0; }
     </style>
 </head>
 <body>
 
-    <header>
-        <img class="logo" src="../../src/images/sgi_logo.svg" alt="SGI — Intelligent Fulfillment" />
-        <div class="header-right">
-            <a class="back-link" href="../../index.html">← Back to Portal</a>
-            <span class="tagline">DataDepot 4</span>
-        </div>
-    </header>
-
-    <div class="hero">
-        <h1><span>Data</span>Depot 4</h1>
-        <div class="accent-bar"></div>
-        <p>Inventory visibility, reporting, and analytics for SGI-managed stock.</p>
+<div id="header">
+    <a class="logo" href="../../index.html">
+        <img src="../../src/images/sgi_logo.svg" alt="SGI">
+        <span class="logo-text">Data<span>Depot</span> v4 Help</span>
+    </a>
+    <div class="search-bar">
+        <input type="text" id="search-field" placeholder="Search" />
+        <button onclick="doSearch()">Search</button>
     </div>
+</div>
 
-    <main>
-        <div class="section-label">Documentation</div>
-        <div class="section-title">DATA<strong>DEPOT HELP</strong></div>
-        <div class="divider">
-            <div class="divider-square"></div>
-            <div class="divider-line"></div>
-        </div>
-
-        <div class="search-bar">
-            <input type="text" placeholder="Search documentation..." />
-            <button type="button">Search</button>
-        </div>
-
-        <div class="depot-layout">
-            <nav class="sidebar">
-                <div class="sidebar-section">
-                    <div class="sidebar-heading">Contents</div>
-                    <a href="#" data-topic="overview" class="active">DataDepot</a>
-                    <a href="#" data-topic="update-schedule">DataDepot Update Schedule</a>
-                </div>
-                <div class="sidebar-section">
-                    <div class="sidebar-heading">Alerts &amp; Items</div>
-                    <a href="#" data-topic="alerts">Alerts</a>
-                    <a href="#" data-topic="items">Items</a>
-                    <a href="#" data-topic="orders" class="has-children">Orders</a>
-                    <div class="sidebar-children" id="orders-children">
-                        <a href="#" data-topic="orders-overview" class="child active">Orders Tab Overview</a>
-                        <a href="#" data-topic="orders-by-type" class="child">Orders By Type Graph</a>
-                        <a href="#" data-topic="orders-search" class="child">Order Search Criteria</a>
-                        <a href="#" data-topic="orders-detail" class="child">Order Detail Page</a>
-                    </div>
-                    <a href="#" data-topic="receipts">Receipts</a>
-                </div>
-                <div class="sidebar-section">
-                    <div class="sidebar-heading">Tools</div>
-                    <a href="#" data-topic="dashboard">Dashboard</a>
-                    <a href="#" data-topic="utilization">Utilization</a>
-                    <a href="#" data-topic="smart-search">Smart Search</a>
-                </div>
-                <div class="sidebar-section">
-                    <div class="sidebar-heading">How To</div>
-                    <a href="#" data-topic="dl-jpeg">Download Chart as JPEG</a>
-                    <a href="#" data-topic="dl-pdf">Download Chart as PDF</a>
-                    <a href="#" data-topic="dl-png">Download Chart as PNG</a>
-                    <a href="#" data-topic="dl-svg">Download Graph as SVG</a>
-                </div>
-            </nav>
-
-            <div class="content-area" id="content-area">
-                <!-- content injected by JS -->
+<div id="body">
+    <!-- SIDEBAR -->
+    <div id="navigation">
+        <ul class="tabs-nav">
+            <li class="active" onclick="switchTab('toc',this)">Contents</li>
+            <li onclick="switchTab('index',this)">Index</li>
+        </ul>
+        <div class="tabs-panels">
+            <!-- TOC -->
+            <div id="tab-toc" class="tab-panel active">
+                <ul class="tree" id="toc-tree"></ul>
+            </div>
+            <!-- Index -->
+            <div id="tab-index" class="tab-panel">
+                <input type="text" class="tab-search" placeholder="Search index..." oninput="filterIndex(this.value)" />
+                <ul class="index-list" id="index-list"></ul>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        &copy; 2026 <span>SGI</span> — Intelligent Fulfillment &nbsp;|&nbsp; internal.mysgi.com
-    </footer>
+    <!-- CONTENT -->
+    <div id="contentBody">
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button class="btn-tool" onclick="window.print()" title="Print">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="1" width="10" height="7" rx="1"/><rect x="1" y="5" width="14" height="7" rx="1"/><rect x="4" y="10" width="8" height="5" rx="1"/></svg>
+                    Print
+                </button>
+                <button class="btn-tool" onclick="expandAll()" title="Expand all">
+                    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1H2zm0 4h12v1H2zm0 4h12v1H2z"/></svg>
+                    Expand All
+                </button>
+                <div class="stars" id="stars">
+                    <span class="star" onclick="rateTopic(1)">★</span>
+                    <span class="star" onclick="rateTopic(2)">★</span>
+                    <span class="star" onclick="rateTopic(3)">★</span>
+                    <span class="star" onclick="rateTopic(4)">★</span>
+                    <span class="star" onclick="rateTopic(5)">★</span>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn-tool" id="btn-prev" onclick="navigate(-1)" title="Previous topic">&#9664; Previous</button>
+                <span class="nav-counter" id="nav-counter">1 of 7</span>
+                <button class="btn-tool" id="btn-next" onclick="navigate(1)" title="Next topic">Next &#9654;</button>
+            </div>
+        </div>
+        <div id="contentBodyInner">
+            <div id="topic-content"></div>
+        </div>
+    </div>
+</div>
 
-    <script src="../../src/js/main.js"></script>
-    <script>
-        const topics = {
-            'overview': {
-                title: 'DataDepot Overview',
-                body: `
-                    <p>DataDepot provides the means to review the stock that SGI manages for you. The DataDepot web site provides two features to assist in finding and assessing information with:</p>
-                    <ul><li><a href="#" data-topic="dashboard">Dashboard</a></li><li><a href="#" data-topic="smart-search">Smart Search</a></li></ul>
-                    <p>The DataDepot web site provides you with access to information about:</p>
-                    <ul>
-                        <li><a href="#" data-topic="alerts">Alerts</a></li>
-                        <li><a href="#" data-topic="items">Items</a></li>
-                        <li><a href="#" data-topic="orders-overview">Orders</a></li>
-                        <li><a href="#" data-topic="receipts">Receipts</a></li>
-                        <li><a href="#" data-topic="utilization">Utilization</a></li>
-                    </ul>
-                    <p>Use DataDepot to assist you in making decisions about the inventory. DataDepot provides the information you need to reduce material and storage costs.</p>`
-            },
-            'orders-overview': {
-                title: 'Orders Tab Overview',
-                body: `
-                    <p>The Orders tab provides visibility into all orders SGI manages on your behalf. From this tab you can search, filter, and review order activity across your inventory.</p>
-                    <p>The Orders tab contains the following sections:</p>
-                    <ul>
-                        <li><a href="#" data-topic="orders-by-type">Orders By Type Graph</a> — a visual breakdown of order types over a selected date range</li>
-                        <li><a href="#" data-topic="orders-search">Order Search Criteria</a> — filter orders by date, type, status, and item</li>
-                        <li><a href="#" data-topic="orders-detail">Order Detail Page</a> — drill into a specific order for line-level detail</li>
-                    </ul>
-                    <p>Use the Orders tab to monitor open orders, review historical order activity, and identify fulfillment trends.</p>`
-            },
-            'orders-by-type': {
-                title: 'Orders By Type Graph',
-                body: `
-                    <p>The Orders By Type graph displays a visual summary of orders grouped by order type for a selected date range.</p>
-                    <p>Use this graph to quickly identify which order types are most active and spot trends in fulfillment activity. The graph updates based on the search criteria you apply in the Orders tab.</p>
-                    <p>You can export the graph using the How To guides:</p>
-                    <ul>
-                        <li><a href="#" data-topic="dl-jpeg">Download Chart as JPEG</a></li>
-                        <li><a href="#" data-topic="dl-pdf">Download Chart as PDF</a></li>
-                        <li><a href="#" data-topic="dl-png">Download Chart as PNG</a></li>
-                        <li><a href="#" data-topic="dl-svg">Download Graph as SVG</a></li>
-                    </ul>`
-            },
-            'orders-search': {
-                title: 'Order Search Criteria',
-                body: `
-                    <p>The Order Search Criteria section allows you to filter the orders displayed in the Orders tab. You can filter by:</p>
-                    <ul>
-                        <li>Date range</li>
-                        <li>Order type</li>
-                        <li>Order status</li>
-                        <li>Item number</li>
-                    </ul>
-                    <p>After setting your criteria, click <strong>Search</strong> to refresh the results. You can also download the results to Excel or search within the results table.</p>`
-            },
-            'orders-detail': {
-                title: 'Order Detail Page',
-                body: `
-                    <p>The Order Detail page provides line-level information for a specific order. To access it, click any order number in the Orders search results.</p>
-                    <p>The detail page includes:</p>
-                    <ul>
-                        <li>Order header information (type, status, dates)</li>
-                        <li>Line items with quantities and statuses</li>
-                        <li>Shipment and receipt details where applicable</li>
-                    </ul>`
-            },
-            'update-schedule': {
-                title: 'DataDepot Update Schedule',
-                body: `<p>DataDepot data is refreshed on a scheduled basis. Contact your SGI representative for the specific update frequency configured for your account.</p>`
-            },
-            'alerts': {
-                title: 'Alerts',
-                body: `<p>The Alerts section surfaces inventory conditions that may require your attention, such as low stock levels or items approaching expiration.</p>`
-            },
-            'items': {
-                title: 'Items',
-                body: `<p>The Items tab provides a full view of the inventory SGI manages for you, including on-hand quantities, item details, and historical activity.</p>`
-            },
-            'receipts': {
-                title: 'Receipts',
-                body: `<p>The Receipts tab shows inbound inventory activity — items received into SGI-managed stock on your behalf.</p>`
-            },
-            'dashboard': {
-                title: 'Dashboard',
-                body: `<p>The Dashboard provides a high-level summary of your inventory health, including key metrics and charts for quick assessment.</p>`
-            },
-            'utilization': {
-                title: 'Utilization',
-                body: `<p>The Utilization section shows how your allocated storage and inventory capacity is being used over time.</p>`
-            },
-            'smart-search': {
-                title: 'Smart Search',
-                body: `<p>Smart Search allows you to search across all DataDepot data — orders, items, receipts, and alerts — from a single search bar.</p>`
-            },
-            'dl-jpeg': { title: 'Download Chart as JPEG', body: `<p>To download a chart as a JPEG: hover over the chart, click the download icon in the top-right corner, and select <strong>Download JPEG</strong>.</p>` },
-            'dl-pdf':  { title: 'Download Chart as PDF',  body: `<p>To download a chart as a PDF: hover over the chart, click the download icon in the top-right corner, and select <strong>Download PDF</strong>.</p>` },
-            'dl-png':  { title: 'Download Chart as PNG',  body: `<p>To download a chart as a PNG: hover over the chart, click the download icon in the top-right corner, and select <strong>Download PNG</strong>.</p>` },
-            'dl-svg':  { title: 'Download Graph as SVG',  body: `<p>To download a graph as an SVG: hover over the graph, click the download icon in the top-right corner, and select <strong>Download SVG</strong>.</p>` },
-        };
+<script>
+// ── TOPIC DATA ──────────────────────────────────────────────────────────────
+const topics = {
+  'datadepot': {
+    title: 'DataDepot',
+    breadcrumb: [],
+    body: `<h1>DataDepot</h1>
+<p>DataDepot provides the means to review the stock that SGI manages for you. The DataDepot web site provides two features to assist in finding and assessing information:</p>
+<ul>
+  <li><a href="#" onclick="loadTopic('dashboard');return false">Dashboard</a></li>
+  <li><a href="#" onclick="loadTopic('smart-search');return false">Smart Search</a></li>
+</ul>
+<p>The DataDepot web site provides you with access to information about:</p>
+<ul>
+  <li><a href="#" onclick="loadTopic('alerts');return false">Alerts</a></li>
+  <li><a href="#" onclick="loadTopic('items');return false">Items</a></li>
+  <li><a href="#" onclick="loadTopic('orders');return false">Orders</a></li>
+  <li><a href="#" onclick="loadTopic('receipts');return false">Receipts</a></li>
+  <li><a href="#" onclick="loadTopic('utilization');return false">Utilization</a></li>
+</ul>
+<p>Use DataDepot to assist you in making decisions about the inventory. DataDepot provides the information you need to reduce material and storage costs.</p>`
+  },
+  'update-schedule': {
+    title: 'DataDepot Update Schedule',
+    breadcrumb: [],
+    body: `<h1>DataDepot Update Schedule</h1>
+<p>DataDepot data is refreshed on a scheduled basis. The update schedule ensures that inventory data remains current and accurate for decision-making purposes.</p>
+<p>Contact your SGI representative for the specific update frequency configured for your account.</p>`
+  },
+  'alerts': {
+    title: 'Alerts',
+    breadcrumb: ['Alerts'],
+    body: `<h1>Alerts</h1>
+<p>The Alerts tab surfaces inventory conditions that may require your attention. Alerts are organized into the following subtabs:</p>
+<ul>
+  <li>Below ROP</li>
+  <li>Out of Stock</li>
+  <li>Backorders</li>
+  <li>Excess Stock</li>
+  <li>Dead Stock</li>
+  <li>Quarantine</li>
+  <li>New Receipts</li>
+  <li>New Items</li>
+</ul>
+<p>Each subtab displays items meeting the alert criteria, allowing you to quickly identify and act on inventory issues.</p>`
+  },
+  'items': {
+    title: 'Items',
+    breadcrumb: ['Items'],
+    body: `<h1>Items Tab Overview</h1>
+<p>The Items tab provides a full view of the inventory SGI manages for you, including on-hand quantities, item details, and historical activity.</p>
+<p>From the Items tab you can:</p>
+<ul>
+  <li>Search for items using the Item Search Criteria</li>
+  <li>View the Item Detail Page for in-depth information</li>
+  <li>Review demand history, receipts, adjustments, inventory cost, and utilization subtabs</li>
+  <li>Download search results to Microsoft Excel</li>
+</ul>`
+  },
+  'orders': {
+    title: 'Orders',
+    breadcrumb: ['Orders'],
+    body: `<h1>Orders Tab Overview</h1>
+<p>The Orders tab provides visibility into all orders SGI manages on your behalf. Use the Orders tab to monitor open orders, review historical order activity, and identify fulfillment trends.</p>
+<p>The Orders tab contains the following sections:</p>
+<ul>
+  <li><a href="#" onclick="loadTopic('orders-by-type');return false">Orders By Type Graph</a> — a visual breakdown of order types over a selected date range</li>
+  <li><a href="#" onclick="loadTopic('orders-search');return false">Order Search Criteria</a> — filter orders by date, type, status, and item</li>
+  <li><a href="#" onclick="loadTopic('orders-detail');return false">Order Detail Page</a> — drill into a specific order for line-level detail</li>
+</ul>
+<p>You can also <a href="#" onclick="loadTopic('orders-download');return false">download order search results to a Microsoft Excel file</a> or <a href="#" onclick="loadTopic('orders-search-within');return false">search within results</a> in the Orders tab.</p>`
+  },
+  'orders-by-type': {
+    title: 'Orders By Type Graph - Orders Tab',
+    breadcrumb: ['Orders', 'Orders Tab Overview'],
+    body: `<h1>Orders By Type Graph - Orders Tab</h1>
+<p>The Orders By Type graph displays a visual summary of orders grouped by order type for a selected date range.</p>
+<p>Use this graph to quickly identify which order types are most active and spot trends in fulfillment activity. The graph updates based on the search criteria you apply in the Orders tab.</p>
+<p>You can export the graph using the How To guides:</p>
+<ul>
+  <li><a href="#" onclick="loadTopic('dl-jpeg');return false">How To Download A Chart As A JPEG Image</a></li>
+  <li><a href="#" onclick="loadTopic('dl-pdf');return false">How To Download A Chart As A PDF File</a></li>
+  <li><a href="#" onclick="loadTopic('dl-png');return false">How To Download A Chart As A PNG Image</a></li>
+  <li><a href="#" onclick="loadTopic('dl-svg');return false">How To Download A Graph As A SVG Image</a></li>
+</ul>`
+  },
+  'orders-search': {
+    title: 'Order Search Criteria',
+    breadcrumb: ['Orders', 'Orders Tab Overview'],
+    body: `<h1>Order Search Criteria</h1>
+<p>The Order Search Criteria section allows you to filter the orders displayed in the Orders tab.</p>
+<table>
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>Date Range</td><td>Filter orders by a start and end date</td></tr>
+  <tr><td>Order Type</td><td>Filter by the type of order (e.g., replenishment, return)</td></tr>
+  <tr><td>Order Status</td><td>Filter by current order status (open, closed, cancelled)</td></tr>
+  <tr><td>Item Number</td><td>Search for orders containing a specific item</td></tr>
+</table>
+<p>After setting your criteria, click <strong>Search</strong> to refresh the results. You can also <a href="#" onclick="loadTopic('orders-download');return false">download the results to Excel</a> or <a href="#" onclick="loadTopic('orders-search-within');return false">search within the results table</a>.</p>`
+  },
+  'orders-download': {
+    title: 'How to Download Order Search Results to a Microsoft Excel File',
+    breadcrumb: ['Orders', 'Orders Tab Overview'],
+    body: `<h1>How to Download Order Search Results to a Microsoft Excel File</h1>
+<p>You can export the order search results to a Microsoft Excel file for further analysis.</p>
+<h2>Steps</h2>
+<ol>
+  <li>Perform an order search using the <a href="#" onclick="loadTopic('orders-search');return false">Order Search Criteria</a>.</li>
+  <li>Once results are displayed, locate the <strong>Download</strong> button above the results table.</li>
+  <li>Click <strong>Download</strong> and select <strong>Microsoft Excel</strong> from the options.</li>
+  <li>The file will download to your computer in .xlsx format.</li>
+</ol>
+<div class="note"><strong>Note:</strong> The download includes all columns currently visible in the results table.</div>`
+  },
+  'orders-search-within': {
+    title: 'How to Search Within Results in the Orders Tab',
+    breadcrumb: ['Orders', 'Orders Tab Overview'],
+    body: `<h1>How to Search Within Results in the Orders Tab</h1>
+<p>After performing an order search, you can further filter the displayed results without re-running the full search.</p>
+<h2>Steps</h2>
+<ol>
+  <li>Perform an order search using the <a href="#" onclick="loadTopic('orders-search');return false">Order Search Criteria</a>.</li>
+  <li>Locate the <strong>Search Within Results</strong> field above the results table.</li>
+  <li>Type your search term. The results table will filter in real time to show only matching rows.</li>
+  <li>Clear the field to return to the full results set.</li>
+</ol>`
+  },
+  'orders-detail': {
+    title: 'Order Detail Page',
+    breadcrumb: ['Orders', 'Order Detail Page'],
+    body: `<h1>Order Detail Page</h1>
+<p>The Order Detail page provides line-level information for a specific order. To access it, click any order number in the Orders search results.</p>
+<p>The detail page includes:</p>
+<ul>
+  <li>Order header information (type, status, dates, customer)</li>
+  <li>Line items with quantities, units of measure, and statuses</li>
+  <li>Shipment and receipt details where applicable</li>
+</ul>
+<p>You can also <a href="#" onclick="loadTopic('orders-detail-search');return false">search within results on the Order Detail Page</a>.</p>`
+  },
+  'orders-detail-search': {
+    title: 'How to Search Within Results on the Order Detail Page',
+    breadcrumb: ['Orders', 'Order Detail Page'],
+    body: `<h1>How to Search Within Results on the Order Detail Page</h1>
+<p>The Order Detail Page includes a search-within-results feature for filtering line items.</p>
+<h2>Steps</h2>
+<ol>
+  <li>Open an order from the <a href="#" onclick="loadTopic('orders');return false">Orders tab</a>.</li>
+  <li>Locate the <strong>Search Within Results</strong> field on the Order Detail Page.</li>
+  <li>Type your search term to filter the line items in real time.</li>
+</ol>`
+  },
+  'receipts': {
+    title: 'Receipts',
+    breadcrumb: ['Receipts'],
+    body: `<h1>Receipts Tab Overview</h1>
+<p>The Receipts tab shows inbound inventory activity — items received into SGI-managed stock on your behalf.</p>
+<p>From the Receipts tab you can:</p>
+<ul>
+  <li>Search for receipts using the Receipts Search Criteria</li>
+  <li>View the Overall Receipts Graph and Top 5 Vendors Receipts Graph</li>
+  <li>Review Out of Spec Reasons</li>
+  <li>Access the Receipt Detail Page</li>
+  <li>Download results to Microsoft Excel</li>
+</ul>`
+  },
+  'dashboard': {
+    title: 'Dashboard',
+    breadcrumb: ['Dashboard'],
+    body: `<h1>Dashboard Tab Overview</h1>
+<p>The Dashboard provides a high-level summary of your inventory health, including key metrics and charts for quick assessment.</p>
+<p>The Dashboard includes the following graphs:</p>
+<ul>
+  <li>Burn Rate Graph</li>
+  <li>Client Satisfaction Graph</li>
+  <li>Inventory Material Cost Graph</li>
+  <li>Inventory Storage Cost Graph</li>
+</ul>`
+  },
+  'utilization': {
+    title: 'Utilization',
+    breadcrumb: ['Utilization'],
+    body: `<h1>Utilization Overview</h1>
+<p>The Utilization section shows how your allocated storage and inventory capacity is being used over time.</p>
+<p>The Utilization tab includes the following subtabs:</p>
+<ul>
+  <li>Snapshot</li>
+  <li>Item Summary</li>
+  <li>By Rep/By Item</li>
+  <li>Qty Shipped</li>
+  <li>Source Data</li>
+</ul>
+<p>You can create and manage Global and User Templates to customize your utilization reports.</p>`
+  },
+  'smart-search': {
+    title: 'Smart Search',
+    breadcrumb: ['Smart Search'],
+    body: `<h1>Smart Search Overview</h1>
+<p>Smart Search allows you to search across all DataDepot data — orders, items, receipts, and adjustments — from a single search interface.</p>
+<p>Smart Search results are organized into the following subtabs:</p>
+<ul>
+  <li>Item Number</li>
+  <li>Adjustments</li>
+  <li>Orders</li>
+  <li>Receipts</li>
+</ul>
+<p>You can also <a href="#" onclick="loadTopic('smart-search-download');return false">download Smart Search results to a Microsoft Excel file</a>.</p>`
+  },
+  'smart-search-download': {
+    title: 'How To Download Smart Search Results to a Microsoft Excel File',
+    breadcrumb: ['Smart Search'],
+    body: `<h1>How To Download Smart Search Results to a Microsoft Excel File</h1>
+<ol>
+  <li>Perform a Smart Search.</li>
+  <li>Select the subtab containing the results you want to export.</li>
+  <li>Click the <strong>Download</strong> button above the results table.</li>
+  <li>Select <strong>Microsoft Excel</strong>. The file downloads in .xlsx format.</li>
+</ol>`
+  },
+  'dl-jpeg': { title: 'How To Download A Chart As A JPEG Image', breadcrumb: [], body: `<h1>How To Download A Chart As A JPEG Image</h1><ol><li>Hover over the chart you want to download.</li><li>Click the camera/download icon that appears in the top-right corner of the chart.</li><li>Select <strong>Download JPEG</strong> from the menu.</li><li>The image will download to your computer.</li></ol>` },
+  'dl-pdf':  { title: 'How To Download A Chart As A PDF File',  breadcrumb: [], body: `<h1>How To Download A Chart As A PDF File</h1><ol><li>Hover over the chart you want to download.</li><li>Click the camera/download icon that appears in the top-right corner of the chart.</li><li>Select <strong>Download PDF</strong> from the menu.</li><li>The PDF will download to your computer.</li></ol>` },
+  'dl-png':  { title: 'How To Download A Chart As A PNG Image', breadcrumb: [], body: `<h1>How To Download A Chart As A PNG Image</h1><ol><li>Hover over the chart you want to download.</li><li>Click the camera/download icon that appears in the top-right corner of the chart.</li><li>Select <strong>Download PNG</strong> from the menu.</li><li>The image will download to your computer.</li></ol>` },
+  'dl-svg':  { title: 'How To Download A Graph As A SVG Image', breadcrumb: [], body: `<h1>How To Download A Graph As A SVG Image</h1><ol><li>Hover over the graph you want to download.</li><li>Click the camera/download icon that appears in the top-right corner of the graph.</li><li>Select <strong>Download SVG</strong> from the menu.</li><li>The SVG file will download to your computer.</li></ol>` },
+};
 
-        const ordersChildren = ['orders-overview','orders-by-type','orders-search','orders-detail'];
+// ── TOC STRUCTURE ────────────────────────────────────────────────────────────
+const tocData = [
+  { id: 'datadepot',      label: 'DataDepot',                type: 'topic' },
+  { id: 'update-schedule',label: 'DataDepot Update Schedule', type: 'topic' },
+  { id: 'alerts',         label: 'Alerts',   type: 'book', children: [] },
+  { id: 'items',          label: 'Items',    type: 'book', children: [] },
+  { id: 'orders',         label: 'Orders',   type: 'book', children: [
+    { id: 'orders-overview-group', label: 'Orders Tab Overview', type: 'book', children: [
+      { id: 'orders-by-type',       label: 'Orders By Type Graph - Orders Tab', type: 'topic' },
+      { id: 'orders-search',        label: 'Order Search Criteria',             type: 'topic' },
+      { id: 'orders-download',      label: 'How to Download Order Search Results to a Microsoft Excel File', type: 'topic' },
+      { id: 'orders-search-within', label: 'How to Search Within Results in the Orders Tab', type: 'topic' },
+    ]},
+    { id: 'orders-detail-group', label: 'Order Detail Page', type: 'book', children: [
+      { id: 'orders-detail',        label: 'Order Detail Page',                 type: 'topic' },
+      { id: 'orders-detail-search', label: 'How to Search Within Results on the Order Detail Page', type: 'topic' },
+    ]},
+  ]},
+  { id: 'receipts',       label: 'Receipts',     type: 'book', children: [] },
+  { id: 'dashboard',      label: 'Dashboard',    type: 'book', children: [] },
+  { id: 'utilization',    label: 'Utilization',  type: 'book', children: [] },
+  { id: 'smart-search',   label: 'Smart Search', type: 'book', children: [
+    { id: 'smart-search-download', label: 'How To Download Smart Search Results to a Microsoft Excel File', type: 'topic' },
+  ]},
+  { id: 'dl-jpeg', label: 'How To Download A Chart As A JPEG Image', type: 'topic' },
+  { id: 'dl-pdf',  label: 'How To Download A Chart As A PDF File',   type: 'topic' },
+  { id: 'dl-png',  label: 'How To Download A Chart As A PNG Image',  type: 'topic' },
+  { id: 'dl-svg',  label: 'How To Download A Graph As A SVG Image',  type: 'topic' },
+];
 
-        function loadTopic(key) {
-            const topic = topics[key];
-            if (!topic) return;
+// flat ordered list for prev/next
+const topicOrder = ['datadepot','update-schedule','alerts','items','orders','orders-by-type','orders-search','orders-download','orders-search-within','orders-detail','orders-detail-search','receipts','dashboard','utilization','smart-search','smart-search-download','dl-jpeg','dl-pdf','dl-png','dl-svg'];
 
-            const area = document.getElementById('content-area');
-            area.innerHTML = `<h2>${topic.title}</h2>${topic.body}`;
+let currentTopic = 'orders';
 
-            // Re-bind inline links
-            area.querySelectorAll('a[data-topic]').forEach(a => {
-                a.addEventListener('click', e => { e.preventDefault(); loadTopic(a.dataset.topic); });
-            });
+// ── BUILD TOC ────────────────────────────────────────────────────────────────
+function buildTree(nodes, container) {
+  nodes.forEach(node => {
+    const li = document.createElement('li');
+    li.className = 'tree-node' + (node.type === 'book' ? '' : '');
+    li.dataset.id = node.id || '';
 
-            // Update sidebar active state
-            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            const match = document.querySelector(`.sidebar a[data-topic="${key}"]`);
-            if (match) match.classList.add('active');
+    const div = document.createElement('div');
 
-            // Toggle orders children open if relevant
-            const childrenEl = document.getElementById('orders-children');
-            const ordersBtn = document.querySelector('.sidebar a[data-topic="orders"]');
-            if (ordersChildren.includes(key)) {
-                childrenEl.classList.add('open');
-                ordersBtn.classList.add('open');
-            }
-        }
+    // toggle
+    const toggle = document.createElement('span');
+    toggle.className = 'tree-toggle';
+    if (node.children && node.children.length) {
+      toggle.textContent = '▶';
+    } else {
+      toggle.className += ' spacer';
+      toggle.textContent = '▶';
+    }
+    div.appendChild(toggle);
 
-        // Bind all sidebar links
-        document.querySelectorAll('.sidebar a[data-topic]').forEach(a => {
-            a.addEventListener('click', e => {
-                e.preventDefault();
-                const key = a.dataset.topic;
-                if (key === 'orders') {
-                    // Toggle children
-                    const childrenEl = document.getElementById('orders-children');
-                    childrenEl.classList.toggle('open');
-                    a.classList.toggle('open');
-                } else {
-                    loadTopic(key);
-                }
-            });
-        });
+    // icon
+    const icon = document.createElement('span');
+    icon.className = 'tree-icon ' + (node.type === 'book' ? 'icon-book' : 'icon-topic');
+    div.appendChild(icon);
 
-        // Load default
-        loadTopic('overview');
-        document.getElementById('orders-children').classList.add('open');
-        document.querySelector('.sidebar a[data-topic="orders"]').classList.add('open');
-    </script>
+    // label
+    const label = document.createElement('span');
+    label.className = 'tree-label';
+    label.textContent = node.label;
+    div.appendChild(label);
 
+    li.appendChild(div);
+
+    if (node.children && node.children.length) {
+      const ul = document.createElement('ul');
+      ul.className = 'tree tree-children';
+      buildTree(node.children, ul);
+      li.appendChild(ul);
+
+      div.addEventListener('click', () => {
+        const expanded = li.classList.contains('expanded');
+        li.classList.toggle('expanded', !expanded);
+        toggle.textContent = expanded ? '▶' : '▼';
+        // if book has a topic, load it
+        if (node.id && topics[node.id]) loadTopic(node.id);
+      });
+    } else {
+      toggle.style.visibility = 'hidden';
+      div.addEventListener('click', () => {
+        if (node.id && topics[node.id]) loadTopic(node.id);
+      });
+    }
+
+    container.appendChild(li);
+  });
+}
+
+// ── LOAD TOPIC ───────────────────────────────────────────────────────────────
+function loadTopic(id) {
+  const t = topics[id];
+  if (!t) return;
+  currentTopic = id;
+
+  // breadcrumb + content
+  const bc = t.breadcrumb.length
+    ? '<div class="breadcrumb">' + t.breadcrumb.map(b => `<a href="#">${b}</a>`).join('<span>›</span>') + (t.breadcrumb.length ? '<span>›</span>' : '') + t.title + '</div>'
+    : '';
+  document.getElementById('topic-content').innerHTML = bc + t.body;
+
+  // update nav counter
+  const idx = topicOrder.indexOf(id);
+  document.getElementById('nav-counter').textContent = (idx + 1) + ' of ' + topicOrder.length;
+  document.getElementById('btn-prev').disabled = idx <= 0;
+  document.getElementById('btn-next').disabled = idx >= topicOrder.length - 1;
+
+  // highlight in TOC
+  document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('selected'));
+  const match = document.querySelector(`.tree-node[data-id="${id}"]`);
+  if (match) {
+    match.classList.add('selected');
+    // expand parents
+    let p = match.parentElement;
+    while (p && p.id !== 'toc-tree') {
+      if (p.classList.contains('tree-children')) {
+        const parentLi = p.parentElement;
+        parentLi.classList.add('expanded');
+        const toggle = parentLi.querySelector(':scope > div .tree-toggle');
+        if (toggle) toggle.textContent = '▼';
+      }
+      p = p.parentElement;
+    }
+    match.scrollIntoView({ block: 'nearest' });
+  }
+
+  // reset stars
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('filled'));
+}
+
+function navigate(dir) {
+  const idx = topicOrder.indexOf(currentTopic);
+  const next = topicOrder[idx + dir];
+  if (next) loadTopic(next);
+}
+
+function expandAll() {
+  document.querySelectorAll('.tree-node').forEach(n => {
+    if (n.querySelector('.tree-children')) {
+      n.classList.add('expanded');
+      const t = n.querySelector(':scope > div .tree-toggle');
+      if (t) t.textContent = '▼';
+    }
+  });
+}
+
+function rateTopic(n) {
+  document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('filled', i < n));
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tabs-nav li').forEach(l => l.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+function buildIndex() {
+  const list = document.getElementById('index-list');
+  Object.entries(topics).sort((a,b) => a[1].title.localeCompare(b[1].title)).forEach(([id, t]) => {
+    const li = document.createElement('li');
+    li.textContent = t.title;
+    li.onclick = () => { loadTopic(id); switchTab('toc', document.querySelector('.tabs-nav li')); };
+    list.appendChild(li);
+  });
+}
+
+function filterIndex(q) {
+  document.querySelectorAll('#index-list li').forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function doSearch() {
+  const q = document.getElementById('search-field').value.trim().toLowerCase();
+  if (!q) return;
+  const match = Object.entries(topics).find(([,t]) => t.title.toLowerCase().includes(q) || t.body.toLowerCase().includes(q));
+  if (match) loadTopic(match[0]);
+}
+document.getElementById('search-field').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+buildTree(tocData, document.getElementById('toc-tree'));
+buildIndex();
+loadTopic('orders');
+
+// auto-expand Orders on load
+const ordersNode = document.querySelector('.tree-node[data-id="orders"]');
+if (ordersNode) {
+  ordersNode.classList.add('expanded');
+  const t = ordersNode.querySelector(':scope > div .tree-toggle');
+  if (t) t.textContent = '▼';
+  // expand Orders Tab Overview group too
+  const ovNode = document.querySelector('.tree-node[data-id="orders-overview-group"]');
+  if (ovNode) {
+    ovNode.classList.add('expanded');
+    const t2 = ovNode.querySelector(':scope > div .tree-toggle');
+    if (t2) t2.textContent = '▼';
+  }
+}
+</script>
 </body>
 </html>
